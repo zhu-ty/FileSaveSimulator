@@ -42,6 +42,7 @@ void CQ::ControlQueue::_write_thread_function(int thread_idx)
 		}
 		memcpy(tmp_data2, tmp_data, this->_data_len);// <- time costing
 		memcpy(_data_queue[found].data, tmp_data2, this->_data_len);// <- time costing
+		_data_queue[found].birth_stamp = SysUtil::getCurrentTimeMicroSecond();
 		_data_queue[found].status = QueueStatus::Occupied;
 		frame_count++;
 		if (frame_count % 100 == 0)
