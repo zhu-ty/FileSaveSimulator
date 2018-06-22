@@ -19,11 +19,13 @@ Commonly used class and def
 #include <queue>
 #include <cmath>
 #include <string>
-#include <time.h>
 #include <algorithm> //transform
-#ifdef _WIN32
+#if defined(_WIN32) || defined(WIN32)
 #include <windows.h>
 #include <direct.h>
+#include <time.h>
+#else
+#include <sys/time.h>
 #endif
 #ifndef max
 #define max(a,b)            (((a) > (b)) ? (a) : (b))
@@ -42,6 +44,16 @@ Commonly used class and def
 #define MAGENTA_TEXT(x) "\033[35;1m" << x << "\033[0m"
 #define CYAN_TEXT(x) "\033[36;1m" << x << "\033[0m"
 #define WHITE_TEXT(x) "\033[37;1m" << x << "\033[0m"
+#endif
+
+#ifdef WIN32
+#if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
+#define DELTA_EPOCH_IN_MICROSECS 11644473600000000Ui64
+#else
+#define DELTA_EPOCH_IN_MICROSECS 11644473600000000ULL
+#endif
+
+
 #endif
 
 
@@ -143,6 +155,64 @@ public:
 		return 0;
 	}
 
+	struct timezone
+	{
+		int  tz_minuteswest; // minutes W of Greenwich  
+		int  tz_dsttime;     // type of dst correction
+	};
+
+#ifdef WIN32
+	static int gettimeofday(struct timeval *tv, struct timezone *tz)
+	{
+		FILETIME ft;
+		uint64_t tmpres = 0;
+		static int tzflag = 0;
+
+
+		if (tv)
+		{
+#ifdef _WIN32_WCE
+			SYSTEMTIME st;
+			GetSystemTime(&st);
+			SystemTimeToFileTime(&st, &ft);
+#else
+			GetSystemTimeAsFileTime(&ft);
+#endif
+
+
+			tmpres |= ft.dwHighDateTime;
+			tmpres <<= 32;
+			tmpres |= ft.dwLowDateTime;
+
+
+			/*converting file time to unix epoch*/
+			tmpres /= 10;  /*convert into microseconds*/
+			tmpres -= DELTA_EPOCH_IN_MICROSECS;
+			tv->tv_sec = (long)(tmpres / 1000000UL);
+			tv->tv_usec = (long)(tmpres % 1000000UL);
+		}
+
+
+		if (tz) {
+			if (!tzflag) {
+				tzflag++;
+			}
+			tz->tz_minuteswest = _timezone / 60;
+			tz->tz_dsttime = _daylight;
+		}
+
+
+		return 0;
+	}
+#endif
+
+	static int64_t getCurrentTimeMicroSecond()
+	{
+		struct timeval tv;
+		gettimeofday(&tv, NULL);
+		return tv.tv_sec * (int64_t)1000000 + tv.tv_usec;
+	}
+
 	static std::string getTimeString()
 	{
 		time_t timep;
@@ -151,6 +221,27 @@ public:
 		strftime(tmp, sizeof(tmp), "__%Y_%m_%d_%H_%M_%S__", localtime(&timep));
 		return tmp;
 	}
+
+	static inline std::string format(const char *msg, ...)
+	{
+		std::size_t const STRING_BUFFER(4096);
+		char text[STRING_BUFFER];
+		va_list list;
+
+		if (msg == 0)
+			return std::string();
+
+		va_start(list, msg);
+#		if(GLM_COMPILER & GLM_COMPILER_VC)
+		vsprintf_s(text, STRING_BUFFER, msg, list);
+#		else//
+		vsprintf(text, msg, list);
+#		endif//
+		va_end(list);
+
+		return std::string(text);
+	}
 };
+
 
 #endif // !__FILE_SAVE_SIMULATOR_COMMON__

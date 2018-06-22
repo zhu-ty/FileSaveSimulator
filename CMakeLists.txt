@@ -49,11 +49,14 @@ set(CMAKE_CXX_STANDARD 11)
 set(MY_HEADER_FILES
 	# C++ header file
     Common.hpp
+    INIReader.h
+    ControlQueue.h
 )
 
 set(MY_SOURCE_FILES 
 	# C++ source file
 	main.cpp
+    ControlQueue.cpp
 )
 
 

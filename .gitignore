@@ -1,6 +1,6 @@
-data/
 build/
 .vscode/
+/data/
 
 *.orig
 
