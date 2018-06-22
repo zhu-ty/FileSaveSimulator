@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
 	//printf("%lld\n", SysUtil::getCurrentTimeMicroSecond());
 	//SysUtil::sleep(10);
 	//printf("%lld\n", SysUtil::getCurrentTimeMicroSecond());
-	system("pause");
+	//system("pause");
     if(argc <= 1)
     {
 		SysUtil::errorOutput("Please specify the config file. Example: ./FileSaveSimulator config.ini");

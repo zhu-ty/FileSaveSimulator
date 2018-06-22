@@ -18,14 +18,17 @@ Commonly used class and def
 #include <iostream>
 #include <queue>
 #include <cmath>
+#include <cstring>
 #include <string>
-#include <algorithm> //transform
+#include <algorithm> //transform 
 #if defined(_WIN32) || defined(WIN32)
 #include <windows.h>
 #include <direct.h>
 #include <time.h>
 #else
 #include <sys/time.h>
+#include <stdarg.h>
+#include <pthread.h>
 #endif
 #ifndef max
 #define max(a,b)            (((a) > (b)) ? (a) : (b))
