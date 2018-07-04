@@ -30,13 +30,13 @@ Commonly used class and def
 #include <stdarg.h>
 #include <pthread.h>
 #endif
-#ifndef max
-#define max(a,b)            (((a) > (b)) ? (a) : (b))
-#endif
+//#ifndef max
+//#define max(a,b)            (((a) > (b)) ? (a) : (b))
+//#endif
 
-#ifndef min
-#define min(a,b)            (((a) < (b)) ? (a) : (b))
-#endif
+//#ifndef min
+//#define min(a,b)            (((a) < (b)) ? (a) : (b))
+//#endif
 
 #ifndef WIN32
 #define BLACK_TEXT(x) "\033[30;1m" << x << "\033[0m"
