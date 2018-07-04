@@ -7,6 +7,7 @@ The data queue class of the project
 
 #include "ControlQueue.h"
 #include <numeric>
+#include "logger.hpp"
 
 void CQ::ControlQueue::_write_thread_function(int thread_idx)
 {
@@ -37,6 +38,9 @@ void CQ::ControlQueue::_write_thread_function(int thread_idx)
 			SysUtil::warningOutput(SysUtil::format(
 				"Writing thread id = %d, queue full! (This is the %d times happening)",
 				thread_idx, full_happen));
+			CLog::WriteLog(SysUtil::format(
+				"Writing thread id = %d, queue full! (This is the %d times happening)",
+				thread_idx, full_happen));
 			full_happen++;
 			continue;
 		}
@@ -49,6 +53,9 @@ void CQ::ControlQueue::_write_thread_function(int thread_idx)
 		{
 			double diff_print_time_s = (SysUtil::getCurrentTimeMicroSecond() - last_print_time) / 1000000.0;
 			SysUtil::infoOutput(SysUtil::format(
+				"Writing thread id = %d, queue writing frame rate : %f",
+				thread_idx, 100 / diff_print_time_s));
+			CLog::WriteLog(SysUtil::format(
 				"Writing thread id = %d, queue writing frame rate : %f",
 				thread_idx, 100 / diff_print_time_s));
 			last_print_time = SysUtil::getCurrentTimeMicroSecond();
@@ -103,6 +110,9 @@ void CQ::ControlQueue::_read_thread_function(int thread_idx)
 			SysUtil::infoOutput(SysUtil::format(
 				"Reading thread id = %d, last 100 save diff time average = %f us",
 				thread_idx, average_diff));
+			CLog::WriteLog(SysUtil::format(
+				"Reading thread id = %d, last 100 save diff time average = %f us",
+				thread_idx, average_diff));
 		}
 		std::string file_name = this->_save_path + SysUtil::format("id%d_count%d.tmp", thread_idx, frame_count);
 		FILE *out = fopen(file_name.c_str(), "wb");
@@ -121,6 +131,9 @@ void CQ::ControlQueue::_read_thread_function(int thread_idx)
 		{
 			double diff_print_time_s = (SysUtil::getCurrentTimeMicroSecond() - last_print_time) / 1000000.0;
 			SysUtil::infoOutput(SysUtil::format(
+				"Reading thread id = %d, file writing frame rate : %f",
+				thread_idx, 100 / diff_print_time_s));
+			CLog::WriteLog(SysUtil::format(
 				"Reading thread id = %d, file writing frame rate : %f",
 				thread_idx, 100 / diff_print_time_s));
 			last_print_time = SysUtil::getCurrentTimeMicroSecond();

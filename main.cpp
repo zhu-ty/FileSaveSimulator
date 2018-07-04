@@ -4,6 +4,7 @@
 #include "INIReader.h"
 #include "ControlQueue.h"
 #include "Common.hpp"
+#include "logger.hpp"
 
 
 int main(int argc, char* argv[])
@@ -38,7 +39,9 @@ int main(int argc, char* argv[])
 	}
 
 	CQ::ControlQueue queue;
+	SysUtil::mkdir(F_save_path);
 	queue.init(D_queue_lenth, C_data_size_KB * 1024);
+	CLog::setlogfile(F_save_path + "/log" + SysUtil::getTimeString() + ".txt");
 	queue.start_read_threads(E_read_thread, F_save_path);
 	queue.start_write_threads(A_write_thread, B_write_frame_rate_max);
 	getchar();

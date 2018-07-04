@@ -52,11 +52,13 @@ set(MY_HEADER_FILES
     Common.hpp
     INIReader.h
     ControlQueue.h
+    logger.hpp
 )
 
 set(MY_SOURCE_FILES 
 	# C++ source file
 	main.cpp
+    logger.cpp
     ControlQueue.cpp
 )
 
