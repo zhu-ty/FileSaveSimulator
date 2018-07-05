@@ -127,6 +127,7 @@ void CQ::ControlQueue::_read_thread_function(int thread_idx)
 				_data_queue[found].data_len - file_size_wrote,
 				out); // <- time costing
 		}
+		fclose(out);
 		_data_queue[found].status = QueueStatus::Avalible;
 		frame_count++;
 		if (frame_count % FRAME_STATIC_COUNT == 0)
