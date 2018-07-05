@@ -9,6 +9,8 @@ The data queue class of the project
 #include <numeric>
 #include "logger.hpp"
 
+#define FRAME_STATIC_COUNT 100
+
 void CQ::ControlQueue::_write_thread_function(int thread_idx)
 {
 	int frame_count = 0;
@@ -49,15 +51,15 @@ void CQ::ControlQueue::_write_thread_function(int thread_idx)
 		_data_queue[found].birth_stamp = SysUtil::getCurrentTimeMicroSecond();
 		_data_queue[found].status = QueueStatus::Occupied;
 		frame_count++;
-		if (frame_count % 100 == 0)
+		if (frame_count % FRAME_STATIC_COUNT == 0)
 		{
 			double diff_print_time_s = (SysUtil::getCurrentTimeMicroSecond() - last_print_time) / 1000000.0;
 			SysUtil::infoOutput(SysUtil::format(
 				"Writing thread id = %d, queue writing frame rate : %f",
-				thread_idx, 100 / diff_print_time_s));
+				thread_idx, FRAME_STATIC_COUNT / diff_print_time_s));
 			CLog::WriteLog(SysUtil::format(
 				"Writing thread id = %d, queue writing frame rate : %f",
-				thread_idx, 100 / diff_print_time_s));
+				thread_idx, FRAME_STATIC_COUNT / diff_print_time_s));
 			last_print_time = SysUtil::getCurrentTimeMicroSecond();
 		}
 		double this_frame_end_time = SysUtil::getCurrentTimeMicroSecond() / 1000000.0;
@@ -93,7 +95,7 @@ void CQ::ControlQueue::_read_thread_function(int thread_idx)
 		}
 		if (found == -1)
 		{
-			if(empty_happen % 1000 == 0)
+			if(empty_happen % (200 * FRAME_STATIC_COUNT) == 0)
 				SysUtil::infoOutput(SysUtil::format(
 					"Reading thread id = %d, queue empty reached, sleep for some time. (This is the %d times happening)",
 					thread_idx, empty_happen));
@@ -102,17 +104,17 @@ void CQ::ControlQueue::_read_thread_function(int thread_idx)
 			continue;
 		}
 		diff_time.push_back(SysUtil::getCurrentTimeMicroSecond() - _data_queue[found].birth_stamp);
-		if (diff_time.size() >= 100)
+		if (diff_time.size() >= FRAME_STATIC_COUNT)
 		{
 			int64_t total_diff = std::accumulate(diff_time.begin(), diff_time.end(), (int64_t)0);
 			double average_diff = (double)total_diff / diff_time.size();
 			diff_time.clear();
 			SysUtil::infoOutput(SysUtil::format(
-				"Reading thread id = %d, last 100 save diff time average = %f us",
-				thread_idx, average_diff));
+				"Reading thread id = %d, last %d save diff time average = %f us",
+				thread_idx, FRAME_STATIC_COUNT, average_diff));
 			CLog::WriteLog(SysUtil::format(
-				"Reading thread id = %d, last 100 save diff time average = %f us",
-				thread_idx, average_diff));
+				"Reading thread id = %d, last %d save diff time average = %f us",
+				thread_idx, FRAME_STATIC_COUNT, average_diff));
 		}
 		std::string file_name = this->_save_path + SysUtil::format("id%d_count%d.tmp", thread_idx, frame_count);
 		FILE *out = fopen(file_name.c_str(), "wb");
@@ -127,15 +129,15 @@ void CQ::ControlQueue::_read_thread_function(int thread_idx)
 		}
 		_data_queue[found].status = QueueStatus::Avalible;
 		frame_count++;
-		if (frame_count % 100 == 0)
+		if (frame_count % FRAME_STATIC_COUNT == 0)
 		{
 			double diff_print_time_s = (SysUtil::getCurrentTimeMicroSecond() - last_print_time) / 1000000.0;
 			SysUtil::infoOutput(SysUtil::format(
 				"Reading thread id = %d, file writing frame rate : %f",
-				thread_idx, 100 / diff_print_time_s));
+				thread_idx, FRAME_STATIC_COUNT / diff_print_time_s));
 			CLog::WriteLog(SysUtil::format(
 				"Reading thread id = %d, file writing frame rate : %f",
-				thread_idx, 100 / diff_print_time_s));
+				thread_idx, FRAME_STATIC_COUNT / diff_print_time_s));
 			last_print_time = SysUtil::getCurrentTimeMicroSecond();
 		}
 	}
